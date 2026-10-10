@@ -1,13 +1,29 @@
 import 'dart:io';
 
 void main() {
-  // 1. Menggunakan List untuk menyimpan data katalog buku perpustakaan
+  // Daftar buku perpustakaan; setiap buku menyimpan ID, judul, penulis, dan status.
   List<Map<String, dynamic>> daftarBuku = [
-    {'id': 'B001', 'judul': 'Belajar Pemrograman Dart', 'penulis': 'Eko Kurniawan', 'status': 'Tersedia'},
-    {'id': 'B002', 'judul': 'Algoritma & Struktur Data', 'penulis': 'Rinaldi Munir', 'status': 'Tersedia'},
-    {'id': 'B003', 'judul': 'Flutter Mobile Development', 'penulis': 'Andi Nugroho', 'status': 'Dipinjam'},
+    {
+      'id': 'B001',
+      'judul': 'Belajar Pemrograman Dart',
+      'penulis': 'Eko Kurniawan',
+      'status': 'Tersedia',
+    },
+    {
+      'id': 'B002',
+      'judul': 'Algoritma & Struktur Data',
+      'penulis': 'Rinaldi Munir',
+      'status': 'Tersedia',
+    },
+    {
+      'id': 'B003',
+      'judul': 'Flutter Mobile Development',
+      'penulis': 'Andi Nugroho',
+      'status': 'Dipinjam',
+    },
   ];
 
+  // Penanda agar menu terus berjalan sampai pengguna memilih keluar.
   bool isRunning = true;
 
   print('=== SISTEM MANAJEMEN PERPUSTAKAAN DIGITAL ===\n');
@@ -22,7 +38,9 @@ void main() {
     print('6. Keluar Program');
     stdout.write('Pilih menu (1-6): ');
 
+    // Teks pilihan yang dimasukkan pengguna; nilainya bisa null.
     String? input = stdin.readLineSync();
+    // Ubah input menjadi angka; gunakan 0 jika input bukan angka.
     int pilihan = int.tryParse(input ?? '') ?? 0;
 
     // 2. Menggunakan switch-case untuk navigasi menu
@@ -32,28 +50,42 @@ void main() {
         if (daftarBuku.isEmpty) {
           print('Katalog buku kosong.');
         } else {
-          print('----------------------------------------------------------------------');
-          print('ID   | Judul Buku                  | Penulis         | Status');
-          print('----------------------------------------------------------------------');
+          print(
+            '----------------------------------------------------------------------',
+          );
+          print(
+            'ID   | Judul Buku                  | Penulis         | Status',
+          );
+          print(
+            '----------------------------------------------------------------------',
+          );
+          // Tampilkan informasi setiap buku yang tersimpan di katalog.
           for (var buku in daftarBuku) {
-            print('${buku['id']} | ${buku['judul'].toString().padRight(27)} | ${buku['penulis'].toString().padRight(15)} | ${buku['status']}');
+            print(
+              '${buku['id']} | ${buku['judul'].toString().padRight(27)} | ${buku['penulis'].toString().padRight(15)} | ${buku['status']}',
+            );
           }
-          print('----------------------------------------------------------------------');
+          print(
+            '----------------------------------------------------------------------',
+          );
         }
         break;
 
       case 2:
         print('\n=== TAMBAH BUKU BARU ===');
         stdout.write('Masukkan ID Buku (contoh: B004): ');
+        // ID untuk membedakan buku ini dari buku lainnya.
         String id = stdin.readLineSync() ?? '';
 
         stdout.write('Masukkan Judul Buku: ');
+        // Judul buku yang akan dimasukkan ke katalog.
         String judul = stdin.readLineSync() ?? '';
 
         stdout.write('Masukkan Nama Penulis: ');
+        // Nama penulis buku tersebut.
         String penulis = stdin.readLineSync() ?? '';
 
-        // Menambahkan buku baru dengan status default 'Tersedia'
+        // Simpan buku baru dengan status awal 'Tersedia'.
         daftarBuku.add({
           'id': id,
           'judul': judul,
@@ -67,9 +99,10 @@ void main() {
       case 3:
         print('\n=== PINJAM BUKU ===');
         stdout.write('Masukkan ID Buku yang ingin dipinjam: ');
+        // ID buku yang ingin dipinjam pengguna.
         String idPinjam = stdin.readLineSync() ?? '';
 
-        // Cari buku di dalam List menggunakan firstWhere
+        // Data buku dengan ID yang cocok; hasilnya kosong jika tidak ditemukan.
         var buku = daftarBuku.firstWhere(
           (item) => item['id'] == idPinjam,
           orElse: () => {},
@@ -77,7 +110,7 @@ void main() {
 
         if (buku.isNotEmpty) {
           if (buku['status'] == 'Tersedia') {
-            // Ubah status buku langsung di dalam List
+            // Tandai buku sebagai sedang dipinjam.
             buku['status'] = 'Dipinjam';
             print('Berhasil! Anda telah meminjam buku "${buku['judul']}".');
           } else {
@@ -91,8 +124,10 @@ void main() {
       case 4:
         print('\n=== KEMBALIKAN BUKU ===');
         stdout.write('Masukkan ID Buku yang ingin dikembalikan: ');
+        // ID buku yang dikembalikan pengguna.
         String idKembali = stdin.readLineSync() ?? '';
 
+        // Data buku dengan ID yang cocok; hasilnya kosong jika tidak ditemukan.
         var buku = daftarBuku.firstWhere(
           (item) => item['id'] == idKembali,
           orElse: () => {},
@@ -102,7 +137,9 @@ void main() {
           if (buku['status'] == 'Dipinjam') {
             // Ubah status kembali menjadi Tersedia
             buku['status'] = 'Tersedia';
-            print('Terima kasih! Buku "${buku['judul']}" berhasil dikembalikan.');
+            print(
+              'Terima kasih! Buku "${buku['judul']}" berhasil dikembalikan.',
+            );
           } else {
             print('Buku ini tidak sedang dipinjam (status sudah Tersedia).');
           }
@@ -114,17 +151,24 @@ void main() {
       case 5:
         print('\n=== PENCARIAN BUKU ===');
         stdout.write('Masukkan kata kunci judul buku: ');
+        // Kata pencarian dibuat huruf kecil agar pencarian tidak membedakan huruf besar/kecil.
         String keyword = (stdin.readLineSync() ?? '').toLowerCase();
 
-        // Menyaring data buku menggunakan .where()
-        var hasilCari = daftarBuku.where(
-          (item) => item['judul'].toString().toLowerCase().contains(keyword),
-        ).toList();
+        // Daftar buku yang judulnya memuat kata kunci tersebut.
+        var hasilCari = daftarBuku
+            .where(
+              (item) =>
+                  item['judul'].toString().toLowerCase().contains(keyword),
+            )
+            .toList();
 
         if (hasilCari.isNotEmpty) {
           print('\nHasil Pencarian:');
+          // Tampilkan semua buku yang cocok dengan kata pencarian.
           for (var buku in hasilCari) {
-            print('- [${buku['id']}] ${buku['judul']} oleh ${buku['penulis']} (${buku['status']})');
+            print(
+              '- [${buku['id']}] ${buku['judul']} oleh ${buku['penulis']} (${buku['status']})',
+            );
           }
         } else {
           print('Tidak ditemukan buku dengan kata kunci "$keyword".');
